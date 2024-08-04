@@ -255,8 +255,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Oyunlar\Need for Speed Most Wanted Dirty\scripts"  /y
-copy "$(TargetDir)*.pdb" "G:\Oyunlar\Need for Speed Most Wanted Dirty\scripts"  /y</Command>
+      <Command>copy "$(TargetDir)*.asi" "D:\Games\MW06\scripts"  /y
+copy "$(TargetDir)*.pdb" "D:\Games\MW06\scripts"  /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_UG2|Win32'">
@@ -272,8 +272,8 @@ copy "$(TargetDir)*.pdb" "G:\Oyunlar\Need for Speed Most Wanted Dirty\scripts"  
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Games\Need for Speed Underground 2\scripts"  /y
-copy "$(TargetDir)*.pdb" "G:\Games\Need for Speed Underground 2\scripts"  /y</Command>
+      <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground 2\scripts"  /y
+copy "$(TargetDir)*.pdb" "D:\Games\Need for Speed Underground 2\scripts"  /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_UG|Win32'">
@@ -289,8 +289,8 @@ copy "$(TargetDir)*.pdb" "G:\Games\Need for Speed Underground 2\scripts"  /y</Co
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Games\Need for Speed Underground\scripts"  /y
-copy "$(TargetDir)*.pdb" "G:\Games\Need for Speed Underground\scripts"  /y</Command>
+      <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground\scripts"  /y
+copy "$(TargetDir)*.pdb" "D:\Games\Need for Speed Underground\scripts"  /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Carbon|Win32'">
@@ -353,6 +353,7 @@ copy "$(TargetDir)*.pdb" "G:\Oyunlar\Need for Speed Undercover\scripts"  /y</Com
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_MW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -361,7 +362,7 @@ copy "$(TargetDir)*.pdb" "G:\Oyunlar\Need for Speed Undercover\scripts"  /y</Com
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Oyunlar\Need for Speed Most Wanted Dirty\scripts"  /y</Command>
+      <Command>copy "$(TargetDir)*.asi" "D:\Games\MW06\scripts"  /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_UG2|Win32'">
@@ -381,7 +382,7 @@ copy "$(TargetDir)*.pdb" "G:\Oyunlar\Need for Speed Undercover\scripts"  /y</Com
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Games\Need for Speed Underground 2\scripts"  /y</Command>
+      <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground 2\scripts"  /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_UG|Win32'">
@@ -401,7 +402,7 @@ copy "$(TargetDir)*.pdb" "G:\Oyunlar\Need for Speed Undercover\scripts"  /y</Com
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Games\Need for Speed Underground\scripts"  /y</Command>
+      <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground\scripts"  /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Carbon|Win32'">

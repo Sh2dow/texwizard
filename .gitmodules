@@ -1,0 +1,9 @@
+[submodule "external/injector"]
+	path = external/injector
+	url = https://github.com/ThirteenAG/injector
+[submodule "external/inireader"]
+	path = external/inireader
+	url = https://github.com/ThirteenAG/IniReader
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/nlohmann/json
