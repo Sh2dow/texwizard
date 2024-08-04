@@ -5,6 +5,11 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <fstream>
+#include <unordered_map>
+#include <windows.h>
+#include "external/injector/injector/include/injector/injector.hpp"
+#include "external/dxsdk/Include/d3dx9tex.h"
 
 #ifdef GAME_UG
 #include "UG_Address.h"
@@ -33,14 +38,61 @@
 std::vector<char*> packList = {};
 std::map<unsigned int, unsigned int> textureMap = {};
 
-DWORD* __cdecl ReplaceTexture(unsigned int hash, int returnDefault, int includeUnloadedTextures)
-{
-	if (textureMap.count(hash) > 0)
-	{
-		hash = textureMap[hash];
-	}
+std::unordered_map<std::string, std::string> unordered_textureMap;
+IDirect3DDevice9* D3DDevice = nullptr;
 
-	return GetTextureInfo(hash, returnDefault, includeUnloadedTextures);
+namespace fs = std::filesystem;
+
+inline void LoadTextureMappings(const std::string& path) {
+	// Existing function to load texture mappings
+	std::cout << "Loading texture mappings from: " << path << std::endl;
+}
+
+inline void ProcessTexturePacks(const std::string& texturePacksPath) {
+	for (const auto& entry : fs::directory_iterator(texturePacksPath)) {
+		if (entry.is_directory()) {
+			std::string texturePackPath = entry.path().string() + "/TexturePackInfo.json";
+			LoadTextureMappings(texturePackPath);
+		}
+	}
+}
+
+inline int main() {
+	std::string texturePacksPath = "NextGenGraphics/TexturePacks";
+	ProcessTexturePacks(texturePacksPath);
+	return 0;
+}
+
+typedef IDirect3DTexture9* (WINAPI*OriginalLoadTextureFunc)(const char* texturePath);
+inline OriginalLoadTextureFunc originalLoadTexture;
+
+inline IDirect3DTexture9* WINAPI HookedLoadTexture(const char* texturePath)
+{
+    std::string textureId(texturePath);
+
+    if (unordered_textureMap.find(textureId) != unordered_textureMap.end())
+    {
+        std::string customTexturePath = unordered_textureMap[textureId];
+
+        IDirect3DTexture9* texture = nullptr;
+        HRESULT hr = D3DXCreateTextureFromFile(D3DDevice, customTexturePath.c_str(), &texture);
+        if (SUCCEEDED(hr))
+        {
+            return texture;
+        }
+    }
+
+    return originalLoadTexture(texturePath);
+}
+
+inline DWORD* __cdecl ReplaceTexture(unsigned int hash, int returnDefault, int includeUnloadedTextures)
+{
+    if (textureMap.count(hash) > 0)
+    {
+        hash = textureMap[hash];
+    }
+
+    return GetTextureInfo(hash, returnDefault, includeUnloadedTextures);
 }
 
 int __fastcall LoadPacks()
@@ -48,226 +100,227 @@ int __fastcall LoadPacks()
 #ifdef GAME_UC
 	int result = LoadGlobalAChunks();
 #else
-	int result = LoadGlobalChunks();
+    int result = LoadGlobalChunks();
 #endif
-	
 
-	// https://github.com/xan1242/xnfsmodfiles
-	for (int index = 0; index < packList.size(); index++)
-	{
-		DWORD* r = CreateResourceFile((int)packList[index], 1, 0, 0, 0);
+
+    // https://github.com/xan1242/xnfsmodfiles
+    for (int index = 0; index < packList.size(); index++)
+    {
+        DWORD* r = CreateResourceFile((int)packList[index], 1, 0, 0, 0);
 #ifdef GAME_UC
 		r[10] = 0x2000;
 		r[11] = *(int*)0xD3BDD4;
 		r[9] = SharedStringPoolAllocate(packList[index]);
 #endif
-		ResourceFileBeginLoading(r, 0, 0);
-	}
+        ResourceFileBeginLoading(r, 0, 0);
+    }
 
-	return result;
+    return result;
 }
 
 
 void Init()
 {
-	// load config
-	std::ifstream ifs;
-	ifs.open("TexWizard.json");
+    // load config
+    std::ifstream ifs;
+    ifs.open("TexWizard.json");
 
-	Json::CharReaderBuilder builder;
-	Json::Value root;
-	JSONCPP_STRING errs;
-	if (!parseFromStream(builder, ifs, &root, &errs))
-	{
-		MessageBoxA(NULL, "Failed to parse TexWizard configuration.", "TexWizard", MB_ICONERROR);
-		return;
-	}
+    Json::CharReaderBuilder builder;
+    Json::Value root;
+    JSONCPP_STRING errs;
+    if (!parseFromStream(builder, ifs, &root, &errs))
+    {
+        MessageBoxA(NULL, "Failed to parse TexWizard configuration.", "TexWizard", MB_ICONERROR);
+        return;
+    }
 
-	// load texture packs
-	Json::Value packs = root["packs"];
+    // load texture packs
+    Json::Value packs = root["packs"];
 
-	for (int index = 0; index < packs.size(); index++)
-	{
-		Json::Value pack = packs[index];
+    for (int index = 0; index < packs.size(); index++)
+    {
+        Json::Value pack = packs[index];
 
-		Json::String packString = pack.asString();
+        Json::String packString = pack.asString();
 
-		std::string packRoot = packString.c_str();
+        std::string packRoot = packString.c_str();
 
-		std::string configPath = packRoot + "\\meta.json";
-		std::string dataPath = packRoot + "\\textures.bin";
+        std::string configPath = packRoot + "\\meta.json";
+        std::string dataPath = packRoot + "\\textures.bin";
 
-		std::ifstream ifs2;
-		ifs2.open("..\\" + configPath);
+        std::ifstream ifs2;
+        ifs2.open("..\\" + configPath);
 
-		Json::CharReaderBuilder builder2;
-		Json::Value root2;
+        Json::CharReaderBuilder builder2;
+        Json::Value root2;
 
-		JSONCPP_STRING errs2;
-		if (!parseFromStream(builder2, ifs2, &root2, &errs2))
-		{
-			MessageBoxA(NULL, ((std::string)"Failed to parse texture pack configuration " + configPath).c_str(), "TexWizard", MB_ICONERROR);
-			continue;
-		}
+        JSONCPP_STRING errs2;
+        if (!parseFromStream(builder2, ifs2, &root2, &errs2))
+        {
+            MessageBoxA(NULL, ((std::string)"Failed to parse texture pack configuration " + configPath).c_str(),
+                        "TexWizard", MB_ICONERROR);
+            continue;
+        }
 
-		char* dataPathChar = new char[dataPath.length() + 1];
-		strcpy(dataPathChar, dataPath.c_str());
+        char* dataPathChar = new char[dataPath.length() + 1];
+        strcpy(dataPathChar, dataPath.c_str());
 
-		packList.push_back(dataPathChar);
+        packList.push_back(dataPathChar);
 
-		Json::Value textures = root2["textures"];
+        Json::Value textures = root2["textures"];
 
-		for (int index = 0; index < textures.size(); index++)
-		{
-			Json::Value texture = textures[index];
+        for (int index = 0; index < textures.size(); index++)
+        {
+            Json::Value texture = textures[index];
 
-			Json::String key = texture[0].asString();
-			Json::String value = texture[1].asString();
+            Json::String key = texture[0].asString();
+            Json::String value = texture[1].asString();
 
-			unsigned int keyHash;
-			unsigned int valueHash;
+            unsigned int keyHash;
+            unsigned int valueHash;
 
-			if (key.rfind("0x", 0) == 0)
-			{
-				key.erase(0, 2);
+            if (key.rfind("0x", 0) == 0)
+            {
+                key.erase(0, 2);
 
-				std::istringstream converter(key);
-				
-				converter >> std::hex >> keyHash;
-			}
-			else
-			{
-				char* keyChar = new char[key.length() + 1];
-				strcpy(keyChar, key.c_str());
+                std::istringstream converter(key);
 
-				keyHash = bStringHash(keyChar);
-			}
+                converter >> std::hex >> keyHash;
+            }
+            else
+            {
+                char* keyChar = new char[key.length() + 1];
+                strcpy(keyChar, key.c_str());
 
-			if (value.rfind("0x", 0) == 0)
-			{
-				value.erase(0, 2);
+                keyHash = bStringHash(keyChar);
+            }
 
-				std::istringstream converter(value);
+            if (value.rfind("0x", 0) == 0)
+            {
+                value.erase(0, 2);
 
-				converter >> std::hex >> valueHash;
-			}
-			else
-			{
-				char* valueChar = new char[value.length() + 1];
-				strcpy(valueChar, value.c_str());
+                std::istringstream converter(value);
 
-				valueHash = bStringHash(valueChar);
-			}
+                converter >> std::hex >> valueHash;
+            }
+            else
+            {
+                char* valueChar = new char[value.length() + 1];
+                strcpy(valueChar, value.c_str());
 
-			textureMap[keyHash] = valueHash;
-		}
-	}
+                valueHash = bStringHash(valueChar);
+            }
+
+            textureMap[keyHash] = valueHash;
+        }
+    }
 
 #ifdef GAME_UC
 	// replace LoadGlobalAChunks call
 	injector::MakeJMP(LoadGlobalAChunks_Hook_Addr_1, LoadPacks, true);
 #else
-	// replace LoadGlobalChunks call
-	injector::MakeCALL(LoadGlobalChunks_Hook_Addr_1, LoadPacks, true);
+    // replace LoadGlobalChunks call
+    injector::MakeCALL(LoadGlobalChunks_Hook_Addr_1, LoadPacks, true);
 #endif
-	
-	// replace all GetTextureInfo calls
+
+    // replace all GetTextureInfo calls
 #ifdef GAME_UC
 	injector::MakeJMP(GetTextureInfo_Hook_Addr_1J, ReplaceTexture, true);
 #else
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_1, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_1, ReplaceTexture, true);
 #endif
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_2, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_3, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_4, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_5, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_6, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_7, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_8, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_9, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_10, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_11, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_12, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_13, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_2, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_3, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_4, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_5, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_6, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_7, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_8, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_9, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_10, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_11, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_12, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_13, ReplaceTexture, true);
 
 #ifndef GAME_UC
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_14, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_15, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_16, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_17, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_18, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_19, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_20, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_21, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_22, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_23, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_24, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_25, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_26, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_27, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_28, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_29, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_30, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_31, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_32, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_14, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_15, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_16, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_17, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_18, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_19, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_20, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_21, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_22, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_23, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_24, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_25, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_26, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_27, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_28, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_29, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_30, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_31, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_32, ReplaceTexture, true);
 #ifdef GAME_PS
 	injector::MakeJMP(GetTextureInfo_Hook_Addr_33J, ReplaceTexture, true);
 	injector::MakeJMP(GetTextureInfo_Hook_Addr_34J, ReplaceTexture, true);
 #else
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_33, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_34, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_33, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_34, ReplaceTexture, true);
 #endif
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_35, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_36, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_37, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_38, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_39, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_40, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_41, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_42, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_43, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_44, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_45, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_46, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_47, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_48, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_49, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_50, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_51, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_52, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_53, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_54, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_55, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_56, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_57, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_58, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_59, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_60, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_61, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_62, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_63, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_64, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_65, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_35, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_36, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_37, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_38, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_39, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_40, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_41, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_42, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_43, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_44, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_45, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_46, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_47, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_48, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_49, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_50, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_51, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_52, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_53, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_54, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_55, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_56, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_57, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_58, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_59, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_60, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_61, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_62, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_63, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_64, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_65, ReplaceTexture, true);
 
 #if (defined (GAME_PS) ||defined (GAME_CARBON) || defined (GAME_MW) || defined (GAME_UG2))
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_66, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_67, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_68, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_69, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_70, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_71, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_72, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_73, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_74, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_75, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_76, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_77, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_78, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_79, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_80, ReplaceTexture, true);
-	injector::MakeCALL(GetTextureInfo_Hook_Addr_81, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_66, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_67, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_68, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_69, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_70, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_71, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_72, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_73, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_74, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_75, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_76, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_77, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_78, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_79, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_80, ReplaceTexture, true);
+    injector::MakeCALL(GetTextureInfo_Hook_Addr_81, ReplaceTexture, true);
 #endif
-	
+
 #if (defined (GAME_PS) ||defined (GAME_CARBON))
 	
 	injector::MakeCALL(GetTextureInfo_Hook_Addr_82, ReplaceTexture, true);
