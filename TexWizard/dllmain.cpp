@@ -1,9 +1,8 @@
 ﻿#include "stdafx.h"
 #include "stdio.h"
 #include <string>
-#include <windows.h>
-#include "external/inireader/IniReader.h"
-#include "external/Detours/src/detours.h"
+#include "../Modules/inireader/IniReader.h"
+#include "../Modules/Detours/src/detours.h"
 #include "TexWizard.h"
 
 void InitD3DDevice()

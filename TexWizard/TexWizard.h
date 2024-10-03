@@ -8,8 +8,8 @@
 #include <fstream>
 #include <unordered_map>
 #include <windows.h>
-#include "external/injector/injector/include/injector/injector.hpp"
-#include "external/dxsdk/Include/d3dx9tex.h"
+#include "../Modules/injector/include/injector/injector.hpp"
+#include "../Modules/d3d9-wrapper/source/dxsdk/d3dx9tex.h"
 
 #ifdef GAME_UG
 #include "UG_Address.h"

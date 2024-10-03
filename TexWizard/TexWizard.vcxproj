@@ -2,8 +2,8 @@
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemGroup>
         <!-- Add Detours project files as None so they are included in the solution -->
-        <None Include="..\external\Detours\src\*.cpp"/>
-        <None Include="..\external\Detours\src\*.h"/>
+        <None Include="..\Modules\Detours\src\*.cpp"/>
+        <None Include="..\Modules\Detours\src\*.h"/>
     </ItemGroup>
     <ItemGroup Label="ProjectConfigurations">
         <ProjectConfiguration Include="Debug_Carbon|Win32">
@@ -75,6 +75,10 @@
     </ImportGroup>
     <PropertyGroup Label="UserMacros"/>
     <ItemDefinitionGroup>
+        <Link>
+            <AdditionalLibraryDirectories>$(DXSDK_DIR)include;$(DXSDK_DIR)Lib\X86;$(DXSDK_DIR)Lib\X64;$(SolutionDir)Libs;..\Modules\Detours\src;..\Modules\IniReader\mINI;..\Modules\IniReader\mINI\src\mini;..\Modules\injector\include\injector;..\Modules\injector\include\injector\gvm;..\Modules\json\include\nlohmann\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
     </ItemGroup>
@@ -84,11 +88,11 @@
     <!-- Ensure Detours is built before building the main project -->
     <!-- Custom Targets for Building Detours -->
     <Target Name="BuildDetours" Condition="'$(Configuration)|$(Platform)'=='Debug_MW|Win32'">
-        <Exec Command="cd $(SolutionDir)external\Detours\src &amp;&amp; nmake"/>
+        <Exec Command="cd $(SolutionDir)Modules\Detours\src &amp;&amp; nmake"/>
     </Target>
 
     <Target Name="BuildDetoursRelease" Condition="'$(Configuration)|$(Platform)'=='Release_MW|Win32'">
-        <Exec Command="cd $(SolutionDir)external\Detours\src &amp;&amp; nmake"/>
+        <Exec Command="cd $(SolutionDir)Modules\Detours\src &amp;&amp; nmake"/>
     </Target>
     <Target Name="BeforeBuild" DependsOnTargets="BuildDetours"/>
     <Target Name="BeforeBuild" Condition="'$(Configuration)|$(Platform)'=='Release_MW|Win32'" DependsOnTargets="BuildDetoursRelease"/>
@@ -285,16 +289,16 @@
             <Optimization>Disabled</Optimization>
             <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_MW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-            <AdditionalIncludeDirectories>..\external\Detours\include;..\external\minidx9\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;..\Modules\Detours\include;..\Modules\minidx9\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
             <LanguageStandard>stdcpplatest</LanguageStandard>
         </ClCompile>
         <Link>
-            <AdditionalLibraryDirectories>..\external\Detours\lib.X86;..\external\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-            <AdditionalDependencies>.\external\Detours\lib.X86\detours.lib;external\minidx9\Lib\x86\d3d9.lib;external\minidx9\Lib\x86\d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalLibraryDirectories>..\Modules\dxsdk\Lib\x86;..\Modules\Detours\lib.X86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>.\Modules\Detours\lib.X86\detours.lib;Modules\minidx9\Lib\x86\d3d9.lib;Modules\minidx9\Lib\x86\d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PreBuildEvent>
             <Command>
-                cd $(SolutionDir)external\Detours\src
+                cd $(SolutionDir)Modules\Detours\src
                 nmake
             </Command>
         </PreBuildEvent>
@@ -312,13 +316,15 @@
             <Optimization>Disabled</Optimization>
             <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_UG2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <LanguageStandard>stdcpplatest</LanguageStandard>
+            <LanguageStandard_C>stdclatest</LanguageStandard_C>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
-            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\external\Detours\src;..\external\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\Modules\Detours\src;..\Modules\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
@@ -341,7 +347,7 @@
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
-            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\external\Detours\src;..\external\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\Modules\Detours\src;..\Modules\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
@@ -363,7 +369,7 @@
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
-            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\external\Detours\src;..\external\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\Modules\Detours\src;..\Modules\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
@@ -386,7 +392,7 @@
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
-            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\external\Detours\src;..\external\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\Modules\Detours\src;..\Modules\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
@@ -409,7 +415,7 @@
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
-            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\external\Detours\src;..\external\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>..\inireader;..\inireader\mINI\src\mini;..\Modules\Detours\src;..\Modules\dxsdk\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
@@ -428,16 +434,16 @@
             <IntrinsicFunctions>true</IntrinsicFunctions>
             <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_MW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <AdditionalIncludeDirectories>..\external\Detours\include;..\external\minidx9\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>..\Modules\Detours\include;..\Modules\minidx9\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
             <LanguageStandard>stdcpplatest</LanguageStandard>
         </ClCompile>
         <Link>
-            <AdditionalLibraryDirectories>..\external\Detours\lib.X86;..\external\minidx9\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-            <AdditionalDependencies>.\external\Detours\lib.X86\detours.lib;external\minidx9\Lib\x86\d3d9.lib;external\minidx9\Lib\x86\d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalLibraryDirectories>..\Modules\Detours\lib.X86;..\Modules\minidx9\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>.\Modules\Detours\lib.X86\detours.lib;Modules\minidx9\Lib\x86\d3d9.lib;Modules\minidx9\Lib\x86\d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PreBuildEvent>
             <Command>
-                cd $(SolutionDir)external\Detours\src
+                cd $(SolutionDir)Modules\Detours\src
                 SET DETOURS_TARGET_PROCESSOR=$(PlatformTarget)
                 nmake
             </Command>
@@ -463,6 +469,8 @@
             <IntrinsicFunctions>true</IntrinsicFunctions>
             <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_UG2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+            <LanguageStandard>stdcpplatest</LanguageStandard>
+            <LanguageStandard_C>stdclatest</LanguageStandard_C>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -557,6 +565,9 @@
     <ItemGroup>
         <ClInclude Include="Carbon_Address.h"/>
         <ClInclude Include="Helpers.h"/>
+        <ClInclude Include="includes\CPatch.h"/>
+        <ClInclude Include="includes\ini_parser.hpp"/>
+        <ClInclude Include="includes\stdafx.h"/>
         <ClInclude Include="MW_Address.h"/>
         <ClInclude Include="PS_Address.h"/>
         <ClInclude Include="TexWizard.h"/>
