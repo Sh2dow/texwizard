@@ -19,21 +19,5 @@
 #include "../Modules/inireader/IniReader.h"
 #include "../Modules/Detours/src/detours.h"
 #include "../Modules/d3d9-wrapper/source/dxsdk/d3dx9tex.h"
-
+#include "../Modules/injector/include/injector/injector.hpp"
 // TODO: reference additional headers your program requires here
-
-
-// #ifdef GAME_UG
-// #include "UG_Address.h"
-// #elif GAME_UG2
-// #include "UG2_Address.h"
-// #elif GAME_MW
-// #include "MW_Address.h"
-// #elif GAME_CARBON
-// #include "Carbon_Address.h"
-// #elif GAME_PS
-// #include "PS_Address.h"  
-// #elif GAME_UC
-// #include "UC_Address.h"  
-// #endif
-
