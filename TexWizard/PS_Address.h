@@ -1,9 +1,11 @@
 #pragma once
+#include "BaseAddress.h"
+
 #ifndef GAME_PS
 #define GAME_PS
 #endif
 
-//#define EntryPoint 0x828C25
+// #define EntryPoint 0x828C25
 #define WrongEntryPointErrorString "This .exe is not supported.\nPlease use a NOCD v1.1 NFS.exe."
 
 #define bStringHash_Addr 0x436680
@@ -11,6 +13,13 @@
 #define ResourceFileBeginLoading_Addr 0x6D9430
 #define LoadGlobalChunks_Addr 0x6DA4D0
 #define GetTextureInfo_Addr 0x459C10
+
+// Initialize function pointers with the game-specific addresses
+void InitPSAddresses()
+{
+    InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, LoadGlobalChunks_Addr,
+                      GetTextureInfo_Addr);
+}
 
 #define LoadGlobalChunks_Hook_Addr_1 0x6DAC3A
 
@@ -123,12 +132,3 @@
 #define GetTextureInfo_Hook_Addr_107P 0x01A177B5
 #define GetTextureInfo_Hook_Addr_108J 0x01A19F25
 #define GetTextureInfo_Hook_Addr_109J 0x01DFA029
-
-unsigned int(*bStringHash)(char* StringToHash) = (unsigned int(*)(char*))bStringHash_Addr;
-
-DWORD* (__cdecl* CreateResourceFile)(int a1, int a2, int a3, int a4, int a5) = (DWORD * (__cdecl*)(int, int, int, int, int))CreateResourceFile_Addr;
-int(__thiscall* ResourceFileBeginLoading)(DWORD* r, int unk1, int unk2) = (int(__thiscall*)(DWORD*, int, int))ResourceFileBeginLoading_Addr;
-
-int(__fastcall* LoadGlobalChunks)() = (int(__fastcall*)())LoadGlobalChunks_Addr;
-
-DWORD* (__cdecl* GetTextureInfo)(unsigned int hash, int returnDefault, int includeUnloadedTextures) = (DWORD * (__cdecl*)(unsigned int, int, int))GetTextureInfo_Addr;

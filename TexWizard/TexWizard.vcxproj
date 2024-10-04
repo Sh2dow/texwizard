@@ -76,8 +76,8 @@
     <PropertyGroup Label="UserMacros"/>
     <ItemDefinitionGroup>
         <Link>
-            <AdditionalLibraryDirectories>$(DXSDK_DIR)include;$(DXSDK_DIR)Lib\X86;$(DXSDK_DIR)Lib\X64;$(SolutionDir)Libs;..\Modules\Detours\src;..\Modules\IniReader\mINI;..\Modules\IniReader\mINI\src\mini;..\Modules\injector\include\injector;..\Modules\injector\include\injector\gvm;..\Modules\json\include\nlohmann\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-            <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalLibraryDirectories>$(DXSDK_DIR)include;$(DXSDK_DIR)Lib\X86;$(DXSDK_DIR)Lib\X64;..\Modules\IniReader\mINI;..\Modules\IniReader\mINI\src\mini;..\Modules\injector\include\injector;..\Modules\injector\include\injector\gvm;..\Modules\json\include\nlohmann\;..\Modules\Detours\bin.X86;..\Modules\Detours\lib.X86;..\Modules\Detours\src;$(SolutionDir)Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
@@ -92,6 +92,9 @@
     </Target>
 
     <Target Name="BuildDetoursRelease" Condition="'$(Configuration)|$(Platform)'=='Release_MW|Win32'">
+        <Exec Command="cd $(SolutionDir)Modules\Detours\src &amp;&amp; nmake"/>
+    </Target>
+    <Target Name="BuildDetoursRelease" Condition="'$(Configuration)|$(Platform)'=='Release_UG2|Win32'">
         <Exec Command="cd $(SolutionDir)Modules\Detours\src &amp;&amp; nmake"/>
     </Target>
     <Target Name="BeforeBuild" DependsOnTargets="BuildDetours"/>
@@ -294,7 +297,7 @@
         </ClCompile>
         <Link>
             <AdditionalLibraryDirectories>..\Modules\dxsdk\Lib\x86;..\Modules\Detours\lib.X86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-            <AdditionalDependencies>.\Modules\Detours\lib.X86\detours.lib;Modules\minidx9\Lib\x86\d3d9.lib;Modules\minidx9\Lib\x86\d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>..\Modules\Detours\lib.X86\detours.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PreBuildEvent>
             <Command>
@@ -304,8 +307,6 @@
         </PreBuildEvent>
         <PostBuildEvent>
             <Command>
-                copy "$(TargetDir)*.asi" "D:\Games\MW06\scripts" /y
-                copy "$(TargetDir)*.pdb" "D:\Games\MW06\scripts" /y
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -328,8 +329,7 @@
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground 2\scripts" /y
-                copy "$(TargetDir)*.pdb" "D:\Games\Need for Speed Underground 2\scripts" /y
+            <Command>
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -351,8 +351,7 @@
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground\scripts" /y
-                copy "$(TargetDir)*.pdb" "D:\Games\Need for Speed Underground\scripts" /y
+            <Command>
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -373,8 +372,7 @@
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Carbon Dirty\scripts" /y
-                copy "$(TargetDir)*.pdb" "D:\Games\Need for Speed Carbon Dirty\scripts" /y
+            <Command>
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -396,8 +394,7 @@
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed ProStreet\scripts" /y
-                copy "$(TargetDir)*.pdb" "D:\Games\Need for Speed ProStreet\scripts" /y
+            <Command>
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -419,8 +416,7 @@
             <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Undercover\scripts" /y
-                copy "$(TargetDir)*.pdb" "D:\Games\Need for Speed Undercover\scripts" /y
+            <Command>
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -439,7 +435,7 @@
         </ClCompile>
         <Link>
             <AdditionalLibraryDirectories>..\Modules\Detours\lib.X86;..\Modules\minidx9\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-            <AdditionalDependencies>.\Modules\Detours\lib.X86\detours.lib;Modules\minidx9\Lib\x86\d3d9.lib;Modules\minidx9\Lib\x86\d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>..\Modules\Detours\lib.X86\detours.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PreBuildEvent>
             <Command>
@@ -450,12 +446,6 @@
         </PreBuildEvent>
         <PostBuildEvent>
             <Command>
-                if exist "D:\Repos\NFS\texwizard\Release_MW\TexWizard\scripts\*.asi" (
-                copy "D:\Repos\NFS\texwizard\Release_MW\TexWizard\scripts\*.asi" "D:\Games\MW06\scripts" /y
-                ) else (
-                echo File not found: "D:\Repos\NFS\texwizard\Release_MW\TexWizard\scripts\*.asi"
-                exit 1
-                )
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -469,17 +459,23 @@
             <IntrinsicFunctions>true</IntrinsicFunctions>
             <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_UG2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+            <AdditionalIncludeDirectories>..\Modules\Detours\include;..\Modules\minidx9\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
             <LanguageStandard>stdcpplatest</LanguageStandard>
-            <LanguageStandard_C>stdclatest</LanguageStandard_C>
         </ClCompile>
         <Link>
-            <SubSystem>Windows</SubSystem>
-            <GenerateDebugInformation>true</GenerateDebugInformation>
-            <EnableCOMDATFolding>true</EnableCOMDATFolding>
-            <OptimizeReferences>true</OptimizeReferences>
+            <AdditionalLibraryDirectories>..\Modules\Detours\lib.X86;..\Modules\minidx9\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>..\Modules\Detours\lib.X86\detours.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
+        <PreBuildEvent>
+            <Command>
+                cd $(SolutionDir)Modules\Detours\src
+                SET DETOURS_TARGET_PROCESSOR=$(PlatformTarget)
+                nmake
+            </Command>
+        </PreBuildEvent>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground 2\scripts" /y</Command>
+            <Command>
+            </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_UG|Win32'">
@@ -491,6 +487,8 @@
             <IntrinsicFunctions>true</IntrinsicFunctions>
             <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_UG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+            <LanguageStandard>stdcpplatest</LanguageStandard>
+            <LanguageStandard_C>stdclatest</LanguageStandard_C>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -498,8 +496,14 @@
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
         </Link>
+        <PreBuildEvent>
+            <Command>
+                cd $(SolutionDir)Modules\Detours\src
+                SET DETOURS_TARGET_PROCESSOR=$(PlatformTarget)
+                nmake
+            </Command>
+        </PreBuildEvent>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Underground\scripts" /y</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Carbon|Win32'">
@@ -519,7 +523,6 @@
             <OptimizeReferences>true</OptimizeReferences>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Carbon Dirty\scripts" /y</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_PS|Win32'">
@@ -539,7 +542,6 @@
             <OptimizeReferences>true</OptimizeReferences>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed ProStreet\scripts" /y</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_UC|Win32'">
@@ -559,15 +561,16 @@
             <OptimizeReferences>true</OptimizeReferences>
         </Link>
         <PostBuildEvent>
-            <Command>copy "$(TargetDir)*.asi" "D:\Games\Need for Speed Undercover\scripts" /y</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemGroup>
+        <ClInclude Include="BaseAddress.h" />
         <ClInclude Include="Carbon_Address.h"/>
         <ClInclude Include="Helpers.h"/>
         <ClInclude Include="includes\CPatch.h"/>
         <ClInclude Include="includes\ini_parser.hpp"/>
         <ClInclude Include="includes\stdafx.h"/>
+        <ClInclude Include="includes\StringHashAdapter.h" />
         <ClInclude Include="MW_Address.h"/>
         <ClInclude Include="PS_Address.h"/>
         <ClInclude Include="TexWizard.h"/>
@@ -578,6 +581,7 @@
         <ClInclude Include="UG_Address.h"/>
     </ItemGroup>
     <ItemGroup>
+        <ClCompile Include="BaseAddress.cpp" />
         <ClCompile Include="dllmain.cpp">
             <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_MW|Win32'">false</CompileAsManaged>
             <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_UG2|Win32'">false</CompileAsManaged>
@@ -644,6 +648,7 @@
             <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_PS|Win32'">Create</PrecompiledHeader>
             <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_UC|Win32'">Create</PrecompiledHeader>
         </ClCompile>
+        <ClCompile Include="TexWizard.cpp" />
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">

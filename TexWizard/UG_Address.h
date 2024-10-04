@@ -1,18 +1,18 @@
 #pragma once
-#ifndef GAME_UG
-#define GAME_UG
-#endif
-
-#define EntryPoint 0x670CB5
-#define WrongEntryPointErrorString "This .exe is not supported.\nPlease use v1.4 English speed.exe (3,03 MB (3.178.496 bytes))."
+#include "BaseAddress.h"
+#include "TexWizard.h"
 
 #define bStringHash_Addr 0x567C70 // edx
-#define CreateResourceFile_Addr 0x4482F0 
+#define CreateResourceFile_Addr 0x4482F0
 #define ResourceFileBeginLoading_Addr 0x448110 // edx, eax, ecx
-
 #define LoadGlobalChunks_Addr 0x448650
 #define GetTextureInfo_Addr 0x5461C0
 
+// Initialize function pointers with the game-specific addresses
+void InitUGAddresses() {
+    InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, 
+                      LoadGlobalChunks_Addr, GetTextureInfo_Addr);
+}
 
 #define LoadGlobalChunks_Hook_Addr_1 0x447285
 
@@ -82,39 +82,21 @@
 #define GetTextureInfo_Hook_Addr_64 0x5AA847
 #define GetTextureInfo_Hook_Addr_65 0x5AA85D
 
-#pragma runtime_checks( "", off )
-DWORD ResourceFile_BeginLoading_Func_Addr = ResourceFileBeginLoading_Addr;
-void __stdcall ResourceFileBeginLoading(void* ResourceFile, void* unk1, void* unk2)
-{
-	_asm
-	{
-		mov edx, ResourceFile
-		mov ecx, unk2
-		mov eax, unk1
-		call ResourceFile_BeginLoading_Func_Addr
-	}
+// Game-specific implementation for UG
+#ifdef GAME_UG
+#pragma runtime_checks("", off)
+
+// Use function pointers as declared in BaseAddress.h
+inline unsigned int __stdcall UG_bStringHash(char* StringToHash) {
+    // Cast the address to a function pointer and call it
+    auto bStringHashFunc = (unsigned int(__stdcall*)(char*))bStringHash_Addr;
+    return bStringHashFunc(StringToHash);
 }
 
-DWORD bStringHash_EDX = 0;
-DWORD bStringHash_Func_Addr = bStringHash_Addr;
-unsigned int __stdcall bStringHash(char* StringToHash)
-{
-	unsigned int result;
-
-	_asm
-	{
-		mov bStringHash_EDX, edx
-		mov edx, StringToHash
-		call bStringHash_Func_Addr
-		mov result, eax
-		mov edx, bStringHash_EDX
-	}
-
-	return result;
+inline void __stdcall UG_ResourceFileBeginLoading(void* ResourceFile, void* unk1, void* unk2) {
+    // Cast the address to a function pointer and call it
+    auto ResourceFileBeginLoadingFunc = (void(__stdcall*)(void*, void*, void*))ResourceFileBeginLoading_Addr;
+    ResourceFileBeginLoadingFunc(ResourceFile, unk1, unk2);
 }
 
-DWORD* (__cdecl* CreateResourceFile)(int a1, int a2, int a3, int a4, int a5) = (DWORD * (__cdecl*)(int, int, int, int, int))CreateResourceFile_Addr;
-
-int(__fastcall* LoadGlobalChunks)() = (int(__fastcall*)())LoadGlobalChunks_Addr;
-
-DWORD* (__cdecl* GetTextureInfo)(unsigned int hash, int returnDefault, int includeUnloadedTextures) = (DWORD * (__cdecl*)(unsigned int, int, int))GetTextureInfo_Addr;
+#endif

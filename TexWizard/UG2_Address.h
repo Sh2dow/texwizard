@@ -1,4 +1,6 @@
 #pragma once
+#include "BaseAddress.h"
+
 #ifndef GAME_UG2
 #define GAME_UG2
 #endif
@@ -12,6 +14,10 @@
 #define LoadGlobalChunks_Addr 0x57FB40
 #define GetTextureInfo_Addr 0x4901D0
 
+// Initialize function pointers with the game-specific addresses
+void InitUG2Addresses() {
+    InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, LoadGlobalChunks_Addr, GetTextureInfo_Addr);
+}
 
 #define LoadGlobalChunks_Hook_Addr_1 0x57ED99
 
@@ -96,12 +102,3 @@
 #define GetTextureInfo_Hook_Addr_79 0x638858
 #define GetTextureInfo_Hook_Addr_80 0x638877
 #define GetTextureInfo_Hook_Addr_81 0x638889
-
-unsigned int(*bStringHash)(char* StringToHash) = (unsigned int(*)(char*))bStringHash_Addr;
-
-DWORD* (__cdecl* CreateResourceFile)(int a1, int a2, int a3, int a4, int a5) = (DWORD * (__cdecl*)(int, int, int, int, int))CreateResourceFile_Addr;
-int(__thiscall* ResourceFileBeginLoading)(DWORD* r, int unk1, int unk2) = (int(__thiscall*)(DWORD*, int, int))ResourceFileBeginLoading_Addr;
-
-int(__fastcall* LoadGlobalChunks)() = (int(__fastcall*)())LoadGlobalChunks_Addr;
-
-DWORD* (__cdecl* GetTextureInfo)(unsigned int hash, int returnDefault, int includeUnloadedTextures) = (DWORD * (__cdecl*)(unsigned int, int, int))GetTextureInfo_Addr;
