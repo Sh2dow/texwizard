@@ -15,10 +15,7 @@
 #include "UC_Address.h"  
 #endif
 
-
-#include <map>
 namespace fs = std::filesystem;
-
 
 // Define the global variable here
 IDirect3DDevice9* D3DDevice = nullptr;
@@ -31,27 +28,28 @@ std::vector<char*> packList = {};
 // Function to initialize the D3D device
 BOOL InitD3DDevice()
 {
-	uintptr_t base = (uintptr_t)GetModuleHandleA(NULL);
-	IMAGE_DOS_HEADER* dos = (IMAGE_DOS_HEADER*)(base);
-	IMAGE_NT_HEADERS* nt = (IMAGE_NT_HEADERS*)(base + dos->e_lfanew);
+	// Obtain the Direct3D device from the game (implementation specific to the game)
+    uintptr_t base = (uintptr_t)GetModuleHandleA(NULL);
+    IMAGE_DOS_HEADER* dos = (IMAGE_DOS_HEADER*)(base);
+    IMAGE_NT_HEADERS* nt = (IMAGE_NT_HEADERS*)(base + dos->e_lfanew);
 #ifdef GAME_PS
 	if (strstr((const char*)(base + (0xA49742 - base)), "ProStreet08Release.exe"))
 	{
 		Init();
 	}
 #else
-	if ((base + nt->OptionalHeader.AddressOfEntryPoint + (0x400000 - base)) == EntryPoint)
-		// Check if .exe file is compatible - Thanks to thelink2012 and MWisBest
-	{
-		Init();
-	}
+    // Check if .exe file is compatible - Thanks to thelink2012 and MWisBest
+    if ((base + nt->OptionalHeader.AddressOfEntryPoint + (0x400000 - base)) == EntryPoint)
+    {
+        Init();
+    }
 #endif
-	else
-	{
-		MessageBoxA(NULL, WrongEntryPointErrorString, "TexWizard", MB_ICONERROR);
-		return FALSE;
-	}
-    // Obtain the Direct3D device from the game (implementation specific to the game)
+    else
+    {
+        MessageBoxA(NULL, WrongEntryPointErrorString, "TexWizard", MB_ICONERROR);
+        return FALSE;
+    }
+    return TRUE;
 }
 
 // Function to get the game folder path dynamically
@@ -88,22 +86,6 @@ std::future<IDirect3DTexture9*> LoadTextureAsync(const std::string& filePath, co
     });
 }
 
-IDirect3DTexture9* LoadCustomTexture(const std::string& filePath)
-{
-    IDirect3DTexture9* texture = nullptr;
-    HRESULT hr = D3DXCreateTextureFromFile(D3DDevice, filePath.c_str(), &texture);
-
-    if (SUCCEEDED(hr))
-    {
-        return texture; // Return the successfully loaded texture
-    }
-    else
-    {
-        std::cerr << "Failed to load texture: " << filePath << std::endl;
-        return nullptr;
-    }
-}
-
 DWORD* __cdecl ReplaceTexture(unsigned int hash, int returnDefault, int includeUnloadedTextures)
 {
     // Check if there's a replacement for the texture hash
@@ -119,7 +101,7 @@ DWORD* __cdecl ReplaceTexture(unsigned int hash, int returnDefault, int includeU
 // Function to traverse the texture packs folder and bind textures asynchronously
 void LoadAndBindTexturesAsync(const std::string& basePath)
 {
-    std::string texturePacksPath = basePath + "/NextGenGraphics/TexturePacks/";
+    std::string texturePacksPath = basePath;
     std::vector<std::future<void>> futures;
 
     // Iterate through each folder in the TexturePacks directory
@@ -128,7 +110,7 @@ void LoadAndBindTexturesAsync(const std::string& basePath)
         if (entry.is_directory())
         {
             std::string folderPath = entry.path().string();
-            std::string texturesPath = folderPath + "/Textures";
+            std::string texturesPath = folderPath;
 
             if (fs::exists(texturesPath))
             {
@@ -152,6 +134,10 @@ void LoadAndBindTexturesAsync(const std::string& basePath)
                         textureMap[fileHash] = fileHash; // Replace with your actual hash mapping logic
                     }
                 }
+            }
+            else
+            {
+                MessageBoxA(NULL, "Path doesn't exist", "Path doesn't exist", MB_ICONERROR);
             }
         }
     }
@@ -210,42 +196,41 @@ int __fastcall LoadPacks()
 #ifdef GAME_UC
 	int result = LoadGlobalAChunks();
 #else
-	int result = LoadGlobalChunks();
+    int result = LoadGlobalChunks();
 #endif
-	
 
-	// https://github.com/xan1242/xnfsmodfiles
-	for (int index = 0; index < packList.size(); index++)
-	{
-		DWORD* r = CreateResourceFile((int)packList[index], 1, 0, 0, 0);
+    // https://github.com/xan1242/xnfsmodfiles
+	for (size_t index = 0; index < packList.size(); index++)
+    {
+        DWORD* r = CreateResourceFile((int)packList[index], 1, 0, 0, 0);
 #ifdef GAME_UC
 		r[10] = 0x2000;
 		r[11] = *(int*)0xD3BDD4;
 		r[9] = SharedStringPoolAllocate(packList[index]);
 #endif
-		ResourceFileBeginLoading(r, 0, 0);
-	}
+        ResourceFileBeginLoading(r, 0, 0);
+    }
 
-	return result;
+    return result;
 }
 
 inline void Init()
 {
-	// Initialize addresses based on the game
+    // Initialize addresses based on the game
 #ifdef GAME_UG
 	InitUGAddresses();  // Ensure this calls InitBaseAddresses inside
 #elif GAME_UG2
-	InitUG2Addresses();
+    InitUG2Addresses();
 #elif GAME_MW
 	InitMWAddresses();
 #elif GAME_CARBON
-	InitCARBONAddresses();
+	InitCarbonAddresses();
 #elif GAME_PS
 	InitPSAddresses();
 #elif GAME_UC
 	InitUCAddresses();
 #endif
-	
+
 #ifdef GAME_UC
 	// replace LoadGlobalAChunks call
 	injector::MakeJMP(LoadGlobalAChunks_Hook_Addr_1, LoadPacks, true);
@@ -260,7 +245,7 @@ inline void Init()
 #else
     injector::MakeCALL(GetTextureInfo_Hook_Addr_1, ReplaceTexture, true);
 #endif
-	
+
     injector::MakeCALL(GetTextureInfo_Hook_Addr_2, ReplaceTexture, true);
     injector::MakeCALL(GetTextureInfo_Hook_Addr_3, ReplaceTexture, true);
     injector::MakeCALL(GetTextureInfo_Hook_Addr_4, ReplaceTexture, true);
@@ -295,7 +280,7 @@ inline void Init()
     injector::MakeCALL(GetTextureInfo_Hook_Addr_31, ReplaceTexture, true);
     injector::MakeCALL(GetTextureInfo_Hook_Addr_32, ReplaceTexture, true);
 #endif
-	
+
 #ifdef GAME_PS
 	injector::MakeJMP(GetTextureInfo_Hook_Addr_33J, ReplaceTexture, true);
 	injector::MakeJMP(GetTextureInfo_Hook_Addr_34J, ReplaceTexture, true);

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "stdafx.h"
-#include "BaseAddress.h"
+#include <map>
+#include "Base_Game_Address.h"
 
 // Declare global variables (extern to avoid redefinition)
 typedef IDirect3DTexture9* (WINAPI*OriginalLoadTextureFunc)(const char* texturePath);

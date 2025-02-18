@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseAddress.h"
+#include "Base_Game_Address.h"
 
 #ifndef GAME_MW
 #define GAME_MW
@@ -15,7 +15,7 @@
 #define GetTextureInfo_Addr 0x503400
 
 // Initialize function pointers with the game-specific addresses
-void InitMWAddresses() {
+inline void InitMWAddresses() {
     InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, LoadGlobalChunks_Addr,
                       GetTextureInfo_Addr);
 }

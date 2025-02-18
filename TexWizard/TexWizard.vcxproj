@@ -101,40 +101,34 @@
     <Target Name="BeforeBuild" Condition="'$(Configuration)|$(Platform)'=='Release_MW|Win32'" DependsOnTargets="BuildDetoursRelease"/>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MW|Win32'" Label="Configuration">
-        <ConfigurationType>DynamicLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <CharacterSet>MultiByte</CharacterSet>
+        <LinkIncremental>true</LinkIncremental>
         <TargetExt>.asi</TargetExt>
+        <TargetName>$(ProjectName)</TargetName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_UG2|Win32'" Label="Configuration">
-        <ConfigurationType>DynamicLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <CharacterSet>MultiByte</CharacterSet>
+        <LinkIncremental>true</LinkIncremental>
         <TargetExt>.asi</TargetExt>
+        <TargetName>$(ProjectName)</TargetName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_UG|Win32'" Label="Configuration">
-        <ConfigurationType>DynamicLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <CharacterSet>MultiByte</CharacterSet>
+        <LinkIncremental>true</LinkIncremental>
         <TargetExt>.asi</TargetExt>
+        <TargetName>$(ProjectName)</TargetName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Carbon|Win32'" Label="Configuration">
-        <ConfigurationType>DynamicLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <CharacterSet>MultiByte</CharacterSet>
+        <LinkIncremental>true</LinkIncremental>
         <TargetExt>.asi</TargetExt>
+        <TargetName>$(ProjectName)</TargetName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_PS|Win32'" Label="Configuration">
-        <ConfigurationType>DynamicLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <CharacterSet>MultiByte</CharacterSet>
+        <LinkIncremental>true</LinkIncremental>
         <TargetExt>.asi</TargetExt>
+        <TargetName>$(ProjectName)</TargetName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_UC|Win32'" Label="Configuration">
-        <ConfigurationType>DynamicLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <CharacterSet>MultiByte</CharacterSet>
+        <LinkIncremental>true</LinkIncremental>
         <TargetExt>.asi</TargetExt>
+        <TargetName>$(ProjectName)</TargetName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MW|Win32'" Label="Configuration">
         <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -219,8 +213,7 @@
     </ImportGroup>
     <PropertyGroup Label="UserMacros"/>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MW|Win32'">
-        <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-        <IntDir>$(SolutionDir)$(Configuration)\$(Platform)\</IntDir>
+        <LinkIncremental>true</LinkIncremental>
         <TargetExt>.asi</TargetExt>
         <TargetName>$(ProjectName)</TargetName>
     </PropertyGroup>
@@ -293,7 +286,7 @@
             <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_MW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
             <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;..\Modules\Detours\include;..\Modules\minidx9\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-            <LanguageStandard>stdcpplatest</LanguageStandard>
+            <LanguageStandard>stdcpp17</LanguageStandard>
         </ClCompile>
         <Link>
             <AdditionalLibraryDirectories>..\Modules\dxsdk\Lib\x86;..\Modules\Detours\lib.X86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -307,6 +300,7 @@
         </PreBuildEvent>
         <PostBuildEvent>
             <Command>
+                start XCOPY /Y /R "$(TargetDir)*" "d:\Games\NFS MW - Vanilla\SCRIPTS\"
             </Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -363,6 +357,7 @@
             <Optimization>Disabled</Optimization>
             <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;GAME_CARBON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <LanguageStandard>stdcpp17</LanguageStandard>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -564,13 +559,13 @@
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemGroup>
-        <ClInclude Include="BaseAddress.h" />
+        <ClInclude Include="Base_Game_Address.h"/>
         <ClInclude Include="Carbon_Address.h"/>
         <ClInclude Include="Helpers.h"/>
         <ClInclude Include="includes\CPatch.h"/>
         <ClInclude Include="includes\ini_parser.hpp"/>
         <ClInclude Include="includes\stdafx.h"/>
-        <ClInclude Include="includes\StringHashAdapter.h" />
+        <ClInclude Include="includes\StringHashAdapter.h"/>
         <ClInclude Include="MW_Address.h"/>
         <ClInclude Include="PS_Address.h"/>
         <ClInclude Include="TexWizard.h"/>
@@ -581,7 +576,7 @@
         <ClInclude Include="UG_Address.h"/>
     </ItemGroup>
     <ItemGroup>
-        <ClCompile Include="BaseAddress.cpp" />
+        <ClCompile Include="Base_Game_Address.cpp"/>
         <ClCompile Include="dllmain.cpp">
             <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_MW|Win32'">false</CompileAsManaged>
             <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_UG2|Win32'">false</CompileAsManaged>
@@ -648,7 +643,7 @@
             <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_PS|Win32'">Create</PrecompiledHeader>
             <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_UC|Win32'">Create</PrecompiledHeader>
         </ClCompile>
-        <ClCompile Include="TexWizard.cpp" />
+        <ClCompile Include="TexWizard.cpp"/>
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">

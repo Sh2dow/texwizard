@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseAddress.h"
+#include "Base_Game_Address.h"
 #include "TexWizard.h"
 
 #define bStringHash_Addr 0x567C70 // edx
@@ -9,7 +9,7 @@
 #define GetTextureInfo_Addr 0x5461C0
 
 // Initialize function pointers with the game-specific addresses
-void InitUGAddresses() {
+inline void InitUGAddresses() {
     InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, 
                       LoadGlobalChunks_Addr, GetTextureInfo_Addr);
 }

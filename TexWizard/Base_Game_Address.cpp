@@ -1,5 +1,5 @@
 #include "stdafx.h"        // Include precompiled headers
-#include "BaseAddress.h"
+#include "Base_Game_Address.h"
 
 unsigned int (*bStringHash)(char* StringToHash) = nullptr;
 DWORD* (*CreateResourceFile)(int a1, int a2, int a3, int a4, int a5) = nullptr;

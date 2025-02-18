@@ -14,25 +14,25 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
                 return FALSE;
             }
             
-            // // Get the game folder path
-            // std::string gameFolderPath = GetGameFolderPath();
-            //
-            // // Load texture mappings and bind textures asynchronously
-            // std::string texturePacksPath = gameFolderPath + "\\NextGenGraphics\\TexturePacks\\";
-            // LoadTextureMappings(texturePacksPath.c_str());
-            // LoadAndBindTexturesAsync(texturePacksPath);
-            //
-            // // Hook the original LoadTexture function
-            // originalLoadTexture = (OriginalLoadTextureFunc)GetProcAddress(
-            //     GetModuleHandle("d3d9.dll"), "OriginalLoadTextureFunctionName");
-            //
-            // if (originalLoadTexture)
-            // {
-            //     DetourTransactionBegin();
-            //     DetourUpdateThread(GetCurrentThread());
-            //     DetourAttach(&(PVOID&)originalLoadTexture, HookedLoadTexture);
-            //     DetourTransactionCommit();
-            // }
+            // Get the game folder path
+            std::string gameFolderPath = GetGameFolderPath();
+            
+            // Load texture mappings and bind textures asynchronously
+            std::string texturePacksPath = gameFolderPath + "\\NextGenGraphics\\TexturePacks\\";
+            LoadTextureMappings(texturePacksPath.c_str());
+            LoadAndBindTexturesAsync(texturePacksPath);
+            
+            // Hook the original LoadTexture function
+            originalLoadTexture = (OriginalLoadTextureFunc)GetProcAddress(
+                GetModuleHandle("d3d9.dll"), "OriginalLoadTextureFunctionName");
+            
+            if (originalLoadTexture)
+            {
+                DetourTransactionBegin();
+                DetourUpdateThread(GetCurrentThread());
+                DetourAttach(&(PVOID&)originalLoadTexture, HookedLoadTexture);
+                DetourTransactionCommit();
+            }
             break;
         }
 

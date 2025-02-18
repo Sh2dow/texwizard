@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseAddress.h"
+#include "Base_Game_Address.h"  // Include the base header
 
 #ifndef GAME_UG2
 #define GAME_UG2
@@ -15,8 +15,10 @@
 #define GetTextureInfo_Addr 0x4901D0
 
 // Initialize function pointers with the game-specific addresses
-void InitUG2Addresses() {
-    InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, LoadGlobalChunks_Addr, GetTextureInfo_Addr);
+inline void InitUG2Addresses()
+{
+    InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, LoadGlobalChunks_Addr,
+                      GetTextureInfo_Addr);
 }
 
 #define LoadGlobalChunks_Hook_Addr_1 0x57ED99

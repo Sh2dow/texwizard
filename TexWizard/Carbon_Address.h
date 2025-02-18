@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseAddress.h"
+#include "Base_Game_Address.h"
 
 #ifndef GAME_CARBON
 #define GAME_CARBON
@@ -15,7 +15,7 @@
 #define GetTextureInfo_Addr 0x55CFD0
 
 // Initialize function pointers with the game-specific addresses
-void InitCarbonAddresses()
+inline void InitCarbonAddresses()
 {
     InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, LoadGlobalChunks_Addr,
                       GetTextureInfo_Addr);
