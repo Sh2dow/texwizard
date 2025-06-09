@@ -20,4 +20,13 @@
 #include "../Modules/Detours/src/detours.h"
 #include "../Modules/d3d9-wrapper/source/dxsdk/d3dx9tex.h"
 #include "../Modules/injector/include/injector/injector.hpp"
+#include "../Modules/json/include/nlohmann/json.hpp"
 // TODO: reference additional headers your program requires here
+
+#if _DEBUG
+#include "Log.h"
+#define printf_s(...) asi_log::Log(__VA_ARGS__)
+#endif
+
+inline HRESULT (WINAPI*Real_D3DXCreateTextureFromFileA)(
+    LPDIRECT3DDEVICE9, LPCSTR, LPDIRECT3DTEXTURE9*) = nullptr;

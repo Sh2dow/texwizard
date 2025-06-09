@@ -14,8 +14,24 @@
 #define LoadGlobalChunks_Addr 0x664780
 #define GetTextureInfo_Addr 0x503400
 
+// #define GLOBAL_D3DDEVICE 0x00982BDC
+constexpr uintptr_t GLOBAL_D3DDEVICE = 0x00982BDC;
+inline IDirect3DDevice9*& g_Device = *reinterpret_cast<IDirect3DDevice9**>(GLOBAL_D3DDEVICE);
+
+inline IDirect3DDevice9* GetGameDevice()
+{
+    return *reinterpret_cast<IDirect3DDevice9**>(GLOBAL_D3DDEVICE);
+}
+
+inline void SetGameDevice(LPDIRECT3DDEVICE9 device)
+{
+    if (device && !IsBadReadPtr(device, 4))
+        g_Device = device;
+}
+
 // Initialize function pointers with the game-specific addresses
-inline void InitMWAddresses() {
+inline void InitMWAddresses()
+{
     InitBaseAddresses(bStringHash_Addr, CreateResourceFile_Addr, ResourceFileBeginLoading_Addr, LoadGlobalChunks_Addr,
                       GetTextureInfo_Addr);
 }

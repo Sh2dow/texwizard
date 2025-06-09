@@ -3,7 +3,33 @@
 #include <map>
 #include "Base_Game_Address.h"
 
+#ifdef GAME_UG
+#include "UG_Address.h"
+#endif
+
+#ifdef GAME_UG2
+#include "UG2_Address.h"
+#endif
+
+#ifdef GAME_MW
+#include "MW_Address.h"
+#endif
+
+#ifdef GAME_CARBON
+#include "Carbon_Address.h"
+#endif
+
+#ifdef GAME_PS
+#include "PS_Address.h"
+#endif
+
+#ifdef GAME_UC
+#include "UC_Address.h"
+#endif
+
 // Declare global variables (extern to avoid redefinition)
+inline IDirect3DDevice9* D3DDevice = nullptr;
+
 typedef IDirect3DTexture9* (WINAPI*OriginalLoadTextureFunc)(const char* texturePath);
 extern OriginalLoadTextureFunc originalLoadTexture;
 

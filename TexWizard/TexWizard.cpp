@@ -18,7 +18,6 @@
 namespace fs = std::filesystem;
 
 // Define the global variable here
-IDirect3DDevice9* D3DDevice = nullptr;
 OriginalLoadTextureFunc originalLoadTexture = nullptr;
 std::unordered_map<unsigned int, unsigned int> textureMap;
 std::unordered_map<std::string, std::future<IDirect3DTexture9*>> asyncTextureMap;
