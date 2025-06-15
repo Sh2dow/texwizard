@@ -84,7 +84,7 @@
 
 #pragma runtime_checks( "", off )
 DWORD ResourceFile_BeginLoading_Func_Addr = ResourceFileBeginLoading_Addr;
-void __stdcall ResourceFileBeginLoading(void* ResourceFile, void* unk1, void* unk2)
+inline void __stdcall ResourceFileBeginLoading(void* ResourceFile, void* unk1, void* unk2)
 {
 	_asm
 	{
@@ -97,7 +97,7 @@ void __stdcall ResourceFileBeginLoading(void* ResourceFile, void* unk1, void* un
 
 DWORD bStringHash_EDX = 0;
 DWORD bStringHash_Func_Addr = bStringHash_Addr;
-unsigned int __stdcall bStringHash(char* StringToHash)
+inline unsigned int __stdcall bStringHash(char* StringToHash)
 {
 	unsigned int result;
 
@@ -113,8 +113,8 @@ unsigned int __stdcall bStringHash(char* StringToHash)
 	return result;
 }
 
-DWORD* (__cdecl* CreateResourceFile)(int a1, int a2, int a3, int a4, int a5) = (DWORD * (__cdecl*)(int, int, int, int, int))CreateResourceFile_Addr;
+inline DWORD* (__cdecl* CreateResourceFile)(int a1, int a2, int a3, int a4, int a5) = (DWORD * (__cdecl*)(int, int, int, int, int))CreateResourceFile_Addr;
 
-int(__fastcall* LoadGlobalChunks)() = (int(__fastcall*)())LoadGlobalChunks_Addr;
+inline int(__fastcall* LoadGlobalChunks)() = (int(__fastcall*)())LoadGlobalChunks_Addr;
 
-DWORD* (__cdecl* GetTextureInfo)(unsigned int hash, int returnDefault, int includeUnloadedTextures) = (DWORD * (__cdecl*)(unsigned int, int, int))GetTextureInfo_Addr;
+inline DWORD* (__cdecl* GetTextureInfo)(unsigned int hash, int returnDefault, int includeUnloadedTextures) = (DWORD * (__cdecl*)(unsigned int, int, int))GetTextureInfo_Addr;

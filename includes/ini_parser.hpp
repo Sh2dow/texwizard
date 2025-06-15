@@ -34,7 +34,6 @@
 #include <cstdio>       // for std::FILE
 #include <algorithm>    // for std::find_if
 #include <functional>   // for std::function
-#include <vector>		// for std::vector
 #include <sstream>
 #include <fstream>
 

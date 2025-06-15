@@ -1,0 +1,22 @@
+[submodule "Modules/injector"]
+	path = Modules/injector
+	url = https://github.com/ThirteenAG/injector.git
+[submodule "Modules/IniReader"]
+	path = Modules/IniReader
+	url = https://github.com/ThirteenAG/IniReader.git
+[submodule "Modules/json"]
+	path = Modules/json
+	url = https://github.com/nlohmann/json.git
+[submodule "Modules/Detour"]
+	path = Modules/Detour
+	url = https://github.com/Zer0Mem0ry/Detour.git
+[submodule "Modules/d3d9-wrapper"]
+	path = Modules/d3d9-wrapper
+	url = https://github.com/ThirteenAG/d3d9-wrapper.git
+[submodule "Modules/Detours"]
+	path = Modules/Detours
+	url = https://github.com/microsoft/Detours.git
+[submodule "Modules/safetyhook"]
+	path = Modules/safetyhook
+	url = https://github.com/cursey/safetyhook.git
+	branch = bddisasm-cpp17
