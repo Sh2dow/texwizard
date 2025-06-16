@@ -25,6 +25,7 @@ struct CustomTexturesHook
     }
 };
 
+
 HRESULT __stdcall HookedPresent(IDirect3DDevice9* pDevice, const RECT* src, const RECT* dest, HWND wnd,
                                 const RGNDATA* dirty)
 {
@@ -36,9 +37,9 @@ HRESULT __stdcall HookedPresent(IDirect3DDevice9* pDevice, const RECT* src, cons
         Init(); // 🔥 Safe to load files, JSON, do anything now
 
         // Hook texture binding hash
-        injector::MakeInline<CustomTexturesHook>(0x61D83C);
+        injector::MakeInline<CustomTexturesHook>(0x61D830);
 
-        printf("[TexWizard] Hook installed at 0x61D83C\n");
+        printf("[TexWizard] Hook installed at 0x61D830\n");
     }
 
     return g_OriginalPresent(pDevice, src, dest, wnd, dirty);

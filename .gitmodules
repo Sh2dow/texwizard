@@ -16,7 +16,3 @@
 [submodule "Modules/Detours"]
 	path = Modules/Detours
 	url = https://github.com/microsoft/Detours.git
-[submodule "Modules/safetyhook"]
-	path = Modules/safetyhook
-	url = https://github.com/cursey/safetyhook.git
-	branch = bddisasm-cpp17

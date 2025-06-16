@@ -18,14 +18,23 @@
 #include <future>
 #include <mutex>
 #include <d3d9.h>
-#include <d3dx9tex.h>
 // TODO: reference additional headers your program requires here
+#include "Modules/d3d9-wrapper/source/dxsdk/d3dx9tex.h"
+#include "Modules/injector/include/injector/assembly.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/allocator.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/common.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/context.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/easy.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/inline_hook.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/mid_hook.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/os.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/utility.hpp"
+#include "Modules/injector/safetyhook/include/safetyhook/vmt_hook.hpp"
+#include "Modules/injector/include/injector/injector.hpp"
+#include "Modules/IniReader/IniReader.h"
+#include "Modules/minhook/include/MinHook.h"
 #include <nlohmann/json.hpp>
-#include "./Modules/injector/include/injector/assembly.hpp"
-#include "./Modules/injector/include/injector/injector.hpp"
-#include "./Modules/IniReader/IniReader.h"
-#include "./Modules/minhook/include/MinHook.h"
-#include "./Modules/json/include/nlohmann/detail/meta/std_fs.hpp"
 
 #ifdef GAME_UG
 #include "UG_Address.h"

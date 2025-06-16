@@ -96,46 +96,38 @@
         <ClCompile>
             <LanguageStandard>stdcpp17</LanguageStandard>
             <AdditionalIncludeDirectories>
+                Modules\d3d9-wrapper\include;
+                Modules\injector\zydis;
+                Modules\injector\safetyhook\include;
                 Modules\injector\include;
                 Modules\IniReader\mINI;
                 Modules\json\include;
-                Modules\Detour\include;
-                Modules\d3d9-wrapper\include;
-                Modules\Detours\include;
-                Modules\safetyhook\include;
-                $(DXSDK_DIR)Include;
+<!--                Modules\Detour\include;-->
+<!--                Modules\Detours\include;-->
+<!--                $(DXSDK_DIR)Include;-->
                 %(AdditionalIncludeDirectories)
             </AdditionalIncludeDirectories>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <AdditionalDependencies>
-                d3d9.lib;d3dx9.lib;winmm.lib;%(AdditionalDependencies)
+<!--                d3dx9.lib;-->
+                d3d9.lib;winmm.lib;%(AdditionalDependencies)
             </AdditionalDependencies>
             <AdditionalLibraryDirectories>
-                $(DXSDK_DIR)Lib\x86;
+<!--                $(DXSDK_DIR)Lib\x86;-->
                 %(AdditionalLibraryDirectories)
             </AdditionalLibraryDirectories>
         </Link>
     </ItemDefinitionGroup>
-
     
-<!--    <ItemDefinitionGroup>-->
-<!--        <ClCompile>-->
-<!--            <AdditionalIncludeDirectories>.\Modules\minhook\include;.\Modules\IniReader\mINI;.\Modules\injector\include;.\Modules\json\include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>-->
-<!--        </ClCompile>-->
-<!--        <Link>-->
-<!--            <SubSystem>Windows</SubSystem>-->
-<!--            <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>-->
-<!--            <AdditionalLibraryDirectories>.\Modules\minhook\include;.\Modules\IniReader\mINI;.\Modules\injector\include\injector;.\Modules\json\include\nlohmann;$(DXSDK_DIR)Lib\x86;%(AdditionalLibraryDirectories);$(SolutionDir)Debug;</AdditionalLibraryDirectories>-->
-<!--        </Link>-->
-<!--    </ItemDefinitionGroup>-->
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MW|Win32' Or '$(Configuration)|$(Platform)'=='Debug_UG2|Win32' Or '$(Configuration)|$(Platform)'=='Debug_UG|Win32' Or '$(Configuration)|$(Platform)'=='Debug_Carbon|Win32' Or '$(Configuration)|$(Platform)'=='Debug_PS|Win32' Or '$(Configuration)|$(Platform)'=='Debug_UC|Win32'">
         <ClCompile>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <WarningLevel>Level3</WarningLevel>
             <Optimization>Disabled</Optimization>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <LanguageStandard>stdcpplatest</LanguageStandard>
         </ClCompile>
         <Link>
             <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -274,9 +266,21 @@
         <ClInclude Include="Carbon_Address.h"/>
         <ClInclude Include="Helpers.h"/>
         <ClInclude Include="includes\CPatch.h"/>
+        <ClInclude Include="includes\IniReader.h" />
         <ClInclude Include="includes\ini_parser.hpp"/>
         <ClInclude Include="includes\StringHashAdapter.h"/>
         <ClInclude Include="Log.h"/>
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\allocator.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\common.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\context.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\easy.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\inline_hook.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\mid_hook.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\os.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\utility.hpp" />
+        <ClInclude Include="Modules\injector\safetyhook\include\safetyhook\vmt_hook.hpp" />
+        
         <ClInclude Include="Modules\injector\include\injector\assembly.hpp" />
         <ClInclude Include="Modules\injector\include\injector\calling.hpp" />
         <ClInclude Include="Modules\injector\include\injector\gvm\gvm.hpp" />
@@ -284,6 +288,7 @@
         <ClInclude Include="Modules\injector\include\injector\hooking.hpp" />
         <ClInclude Include="Modules\injector\include\injector\injector.hpp" />
         <ClInclude Include="Modules\injector\include\injector\utility.hpp" />
+        
         <ClInclude Include="Modules\minhook\src\buffer.h" />
         <ClInclude Include="Modules\minhook\src\hde\hde32.h" />
         <ClInclude Include="Modules\minhook\src\hde\pstdint.h" />
@@ -297,6 +302,7 @@
         <ClInclude Include="UC_Address.h"/>
         <ClInclude Include="UG2_Address.h"/>
         <ClInclude Include="UG_Address.h"/>
+        <ClCompile Include="Modules\injector\zydis\zydis.h" />
     </ItemGroup>
     <ItemGroup>
         <ClCompile Include="dllmain.cpp">
@@ -306,11 +312,25 @@
         <ClCompile Include="jsoncpp.cpp">
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
         </ClCompile>
+        <ClCompile Include="Modules\injector\safetyhook\src\allocator.cpp" />
+        <ClCompile Include="Modules\injector\safetyhook\src\easy.cpp" />
+        <ClCompile Include="Modules\injector\safetyhook\src\inline_hook.cpp" />
+        <ClCompile Include="Modules\injector\safetyhook\src\mid_hook.cpp" />
+        <ClCompile Include="Modules\injector\safetyhook\src\os.linux.cpp" />
+        <ClCompile Include="Modules\injector\safetyhook\src\os.windows.cpp" />
+        <ClCompile Include="Modules\injector\safetyhook\src\utility.cpp" />
+        <ClCompile Include="Modules\injector\safetyhook\src\vmt_hook.cpp" />
         <ClCompile Include="TexWizard.cpp"/>
-        <ClCompile Include=".\Modules\minhook\src\hde\hde32.c"/>
-        <ClCompile Include=".\Modules\minhook\src\trampoline.c"/>
-        <ClCompile Include=".\Modules\minhook\src\buffer.c"/>
-        <ClCompile Include=".\Modules\minhook\src\hook.c"/>
+        <ClCompile Include="Modules\minhook\src\hde\hde32.c"/>
+        <ClCompile Include="Modules\minhook\src\trampoline.c"/>
+        <ClCompile Include="Modules\minhook\src\buffer.c"/>
+        <ClCompile Include="Modules\minhook\src\hook.c"/>
+        <ClCompile Include="Modules\injector\zydis\zydis.c" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Modules\injector\safetyhook\src\mid_hook.x86_32.asm" />
+      <Content Include="Modules\injector\safetyhook\src\mid_hook.x86_64-linux.asm" />
+      <Content Include="Modules\injector\safetyhook\src\mid_hook.x86_64-windows.asm" />
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">
